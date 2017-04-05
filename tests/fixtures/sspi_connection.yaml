@@ -1,25 +1,5 @@
 interactions:
 - request:
-    body: null
-    headers:
-      Accept: ['*/*']
-      Accept-Encoding: ['gzip, deflate']
-      Connection: [keep-alive]
-      User-Agent: [python-requests/2.7.0 CPython/2.7.10 Darwin/15.0.0]
-    method: GET
-    uri: https://vcsa/sdk/vimServiceVersions.xml
-  response:
-    body: {string: !!python/unicode '<?xml version="1.0" encoding="UTF-8" ?><namespaces
-        version="1.0"><namespace><name>urn:vim25</name><version>6.0</version><priorVersions><version>5.5</version><version>5.1</version><version>5.0</version><version>4.1</version><version>4.0</version><version>2.5u2server</version><version>2.5u2</version><version>2.5</version></priorVersions></namespace><namespace><name>urn:vim2</name><version>2.0</version></namespace></namespaces>
-
-        '}
-    headers:
-      connection: [Keep-Alive]
-      content-length: ['429']
-      content-type: [text/xml]
-      date: ['Mon, 12 Oct 2015 16:18:07 GMT']
-    status: {code: 200, message: OK}
-- request:
     body: '<?xml version="1.0" encoding="UTF-8"?>
 
       <soapenv:Envelope xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
@@ -33,7 +13,7 @@ interactions:
       Accept-Encoding: ['gzip, deflate']
       Content-Type: [text/xml; charset=UTF-8]
       Cookie: ['']
-      SOAPAction: ['"urn:vim25/6.0"']
+      SOAPAction: ['"urn:vim25/4.1"']
     method: POST
     uri: https://vcsa/sdk
   response:
@@ -49,19 +29,17 @@ interactions:
         \ VirtualCenter Server</licenseProductName><licenseProductVersion>6.0</licenseProductVersion></about><setting\
         \ type=\"OptionManager\">VpxSettings</setting><userDirectory type=\"UserDirectory\"\
         >UserDirectory</userDirectory><sessionManager type=\"SessionManager\">SessionManager</sessionManager><authorizationManager\
-        \ type=\"AuthorizationManager\">AuthorizationManager</authorizationManager><serviceManager\
-        \ type=\"ServiceManager\">ServiceMgr</serviceManager><perfManager type=\"\
-        PerformanceManager\">PerfMgr</perfManager><scheduledTaskManager type=\"ScheduledTaskManager\"\
-        >ScheduledTaskManager</scheduledTaskManager><alarmManager type=\"AlarmManager\"\
-        >AlarmManager</alarmManager><eventManager type=\"EventManager\">EventManager</eventManager><taskManager\
-        \ type=\"TaskManager\">TaskManager</taskManager><extensionManager type=\"\
-        ExtensionManager\">ExtensionManager</extensionManager><customizationSpecManager\
+        \ type=\"AuthorizationManager\">AuthorizationManager</authorizationManager><perfManager\
+        \ type=\"PerformanceManager\">PerfMgr</perfManager><scheduledTaskManager type=\"\
+        ScheduledTaskManager\">ScheduledTaskManager</scheduledTaskManager><alarmManager\
+        \ type=\"AlarmManager\">AlarmManager</alarmManager><eventManager type=\"EventManager\"\
+        >EventManager</eventManager><taskManager type=\"TaskManager\">TaskManager</taskManager><extensionManager\
+        \ type=\"ExtensionManager\">ExtensionManager</extensionManager><customizationSpecManager\
         \ type=\"CustomizationSpecManager\">CustomizationSpecManager</customizationSpecManager><customFieldsManager\
         \ type=\"CustomFieldsManager\">CustomFieldsManager</customFieldsManager><diagnosticManager\
         \ type=\"DiagnosticManager\">DiagMgr</diagnosticManager><licenseManager type=\"\
         LicenseManager\">LicenseManager</licenseManager><searchIndex type=\"SearchIndex\"\
-        >SearchIndex</searchIndex><fileManager type=\"FileManager\">FileManager</fileManager><datastoreNamespaceManager\
-        \ type=\"DatastoreNamespaceManager\">DatastoreNamespaceManager</datastoreNamespaceManager><virtualDiskManager\
+        >SearchIndex</searchIndex><fileManager type=\"FileManager\">FileManager</fileManager><virtualDiskManager\
         \ type=\"VirtualDiskManager\">virtualDiskManager</virtualDiskManager><snmpSystem\
         \ type=\"HostSnmpSystem\">SnmpSystem</snmpSystem><vmProvisioningChecker type=\"\
         VirtualMachineProvisioningChecker\">ProvChecker</vmProvisioningChecker><vmCompatibilityChecker\
@@ -73,18 +51,14 @@ interactions:
         >ClusterProfileManager</clusterProfileManager><complianceManager type=\"ProfileComplianceManager\"\
         >MoComplianceManager</complianceManager><localizationManager type=\"LocalizationManager\"\
         >LocalizationManager</localizationManager><storageResourceManager type=\"\
-        StorageResourceManager\">StorageResourceManager</storageResourceManager><guestOperationsManager\
-        \ type=\"GuestOperationsManager\">guestOperationsManager</guestOperationsManager><overheadMemoryManager\
-        \ type=\"OverheadMemoryManager\">OverheadMemoryManger</overheadMemoryManager><certificateManager\
-        \ type=\"CertificateManager\">certificateManager</certificateManager><ioFilterManager\
-        \ type=\"IoFilterManager\">IoFilterManager</ioFilterManager></returnval></RetrieveServiceContentResponse>\n\
+        StorageResourceManager\">StorageResourceManager</storageResourceManager></returnval></RetrieveServiceContentResponse>\n\
         </soapenv:Body>\n</soapenv:Envelope>"}
     headers:
       cache-control: [no-cache]
       connection: [Keep-Alive]
-      content-length: ['3853']
+      content-length: ['3320']
       content-type: [text/xml; charset=utf-8]
-      date: ['Mon, 12 Oct 2015 16:18:07 GMT']
+      date: ['Mon, 12 Oct 2015 16:20:20 GMT']
     status: {code: 200, message: OK}
 - request:
     body: '<?xml version="1.0" encoding="UTF-8"?>
@@ -93,14 +67,14 @@ interactions:
       xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-      <soapenv:Body><Login xmlns="urn:vim25"><_this type="SessionManager">SessionManager</_this><userName>my_user</userName><password>my_password</password></Login></soapenv:Body>
+      <soapenv:Body><LoginBySSPI xmlns="urn:vim25"><_this type="SessionManager">SessionManager</_this><base64Token>my_base64token</base64Token></LoginBySSPI></soapenv:Body>
 
       </soapenv:Envelope>'
     headers:
       Accept-Encoding: ['gzip, deflate']
       Content-Type: [text/xml; charset=UTF-8]
       Cookie: ['']
-      SOAPAction: ['"urn:vim25/6.0"']
+      SOAPAction: ['"urn:vim25/4.1"']
     method: POST
     uri: https://vcsa/sdk
   response:
@@ -108,15 +82,15 @@ interactions:
         <soapenv:Envelope xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\"\
         \n xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\"\n xmlns:xsd=\"\
         http://www.w3.org/2001/XMLSchema\"\n xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\
-        >\n<soapenv:Body>\n<LoginResponse xmlns=\"urn:vim25\"><returnval><key>52ad453a-13a7-e8af-9186-a1b5c5ab85b7</key><userName>my_user</userName><fullName>my_user</fullName><loginTime>2015-10-12T16:18:07.543834Z</loginTime><lastActiveTime>2015-10-12T16:18:07.543834Z</lastActiveTime><locale>en</locale><messageLocale>en</messageLocale><extensionSession>false</extensionSession><ipAddress>10.20.125.215</ipAddress><userAgent></userAgent><callCount>0</callCount></returnval></LoginResponse>\n\
+        >\n<soapenv:Body>\n<LoginResponse xmlns=\"urn:vim25\"><returnval><key>52b5395a-85c2-9902-7835-13a9b77e1fec</key><userName>my_user</userName><fullName>my_user</fullName><loginTime>2015-10-12T16:20:20.388804Z</loginTime><lastActiveTime>2015-10-12T16:20:20.388804Z</lastActiveTime><locale>en</locale><messageLocale>en</messageLocale></returnval></LoginResponse>\n\
         </soapenv:Body>\n</soapenv:Envelope>"}
     headers:
       cache-control: [no-cache]
       connection: [Keep-Alive]
-      content-length: ['829']
+      content-length: ['704']
       content-type: [text/xml; charset=utf-8]
-      date: ['Mon, 12 Oct 2015 16:18:07 GMT']
-      set-cookie: [vmware_soap_session="8fc51e13679819f71dd3e925154d49dcf91f9759";
+      date: ['Mon, 12 Oct 2015 16:20:20 GMT']
+      set-cookie: [vmware_soap_session="57e9ef0e1210352a3cf607db32a20792334f5b81";
           Path=/; HttpOnly; Secure;]
     status: {code: 200, message: OK}
 - request:
@@ -132,9 +106,9 @@ interactions:
     headers:
       Accept-Encoding: ['gzip, deflate']
       Content-Type: [text/xml; charset=UTF-8]
-      Cookie: [vmware_soap_session="8fc51e13679819f71dd3e925154d49dcf91f9759"; Path=/;
+      Cookie: [vmware_soap_session="57e9ef0e1210352a3cf607db32a20792334f5b81"; Path=/;
           HttpOnly; Secure;]
-      SOAPAction: ['"urn:vim25/6.0"']
+      SOAPAction: ['"urn:vim25/4.1"']
     method: POST
     uri: https://vcsa/sdk
   response:
@@ -150,19 +124,17 @@ interactions:
         \ VirtualCenter Server</licenseProductName><licenseProductVersion>6.0</licenseProductVersion></about><setting\
         \ type=\"OptionManager\">VpxSettings</setting><userDirectory type=\"UserDirectory\"\
         >UserDirectory</userDirectory><sessionManager type=\"SessionManager\">SessionManager</sessionManager><authorizationManager\
-        \ type=\"AuthorizationManager\">AuthorizationManager</authorizationManager><serviceManager\
-        \ type=\"ServiceManager\">ServiceMgr</serviceManager><perfManager type=\"\
-        PerformanceManager\">PerfMgr</perfManager><scheduledTaskManager type=\"ScheduledTaskManager\"\
-        >ScheduledTaskManager</scheduledTaskManager><alarmManager type=\"AlarmManager\"\
-        >AlarmManager</alarmManager><eventManager type=\"EventManager\">EventManager</eventManager><taskManager\
-        \ type=\"TaskManager\">TaskManager</taskManager><extensionManager type=\"\
-        ExtensionManager\">ExtensionManager</extensionManager><customizationSpecManager\
+        \ type=\"AuthorizationManager\">AuthorizationManager</authorizationManager><perfManager\
+        \ type=\"PerformanceManager\">PerfMgr</perfManager><scheduledTaskManager type=\"\
+        ScheduledTaskManager\">ScheduledTaskManager</scheduledTaskManager><alarmManager\
+        \ type=\"AlarmManager\">AlarmManager</alarmManager><eventManager type=\"EventManager\"\
+        >EventManager</eventManager><taskManager type=\"TaskManager\">TaskManager</taskManager><extensionManager\
+        \ type=\"ExtensionManager\">ExtensionManager</extensionManager><customizationSpecManager\
         \ type=\"CustomizationSpecManager\">CustomizationSpecManager</customizationSpecManager><customFieldsManager\
         \ type=\"CustomFieldsManager\">CustomFieldsManager</customFieldsManager><diagnosticManager\
         \ type=\"DiagnosticManager\">DiagMgr</diagnosticManager><licenseManager type=\"\
         LicenseManager\">LicenseManager</licenseManager><searchIndex type=\"SearchIndex\"\
-        >SearchIndex</searchIndex><fileManager type=\"FileManager\">FileManager</fileManager><datastoreNamespaceManager\
-        \ type=\"DatastoreNamespaceManager\">DatastoreNamespaceManager</datastoreNamespaceManager><virtualDiskManager\
+        >SearchIndex</searchIndex><fileManager type=\"FileManager\">FileManager</fileManager><virtualDiskManager\
         \ type=\"VirtualDiskManager\">virtualDiskManager</virtualDiskManager><snmpSystem\
         \ type=\"HostSnmpSystem\">SnmpSystem</snmpSystem><vmProvisioningChecker type=\"\
         VirtualMachineProvisioningChecker\">ProvChecker</vmProvisioningChecker><vmCompatibilityChecker\
@@ -174,18 +146,14 @@ interactions:
         >ClusterProfileManager</clusterProfileManager><complianceManager type=\"ProfileComplianceManager\"\
         >MoComplianceManager</complianceManager><localizationManager type=\"LocalizationManager\"\
         >LocalizationManager</localizationManager><storageResourceManager type=\"\
-        StorageResourceManager\">StorageResourceManager</storageResourceManager><guestOperationsManager\
-        \ type=\"GuestOperationsManager\">guestOperationsManager</guestOperationsManager><overheadMemoryManager\
-        \ type=\"OverheadMemoryManager\">OverheadMemoryManger</overheadMemoryManager><certificateManager\
-        \ type=\"CertificateManager\">certificateManager</certificateManager><ioFilterManager\
-        \ type=\"IoFilterManager\">IoFilterManager</ioFilterManager></returnval></RetrieveServiceContentResponse>\n\
+        StorageResourceManager\">StorageResourceManager</storageResourceManager></returnval></RetrieveServiceContentResponse>\n\
         </soapenv:Body>\n</soapenv:Envelope>"}
     headers:
       cache-control: [no-cache]
       connection: [Keep-Alive]
-      content-length: ['3853']
+      content-length: ['3320']
       content-type: [text/xml; charset=utf-8]
-      date: ['Mon, 12 Oct 2015 16:18:07 GMT']
+      date: ['Mon, 12 Oct 2015 16:20:20 GMT']
     status: {code: 200, message: OK}
 - request:
     body: '<?xml version="1.0" encoding="UTF-8"?>
@@ -201,9 +169,9 @@ interactions:
     headers:
       Accept-Encoding: ['gzip, deflate']
       Content-Type: [text/xml; charset=UTF-8]
-      Cookie: [vmware_soap_session="8fc51e13679819f71dd3e925154d49dcf91f9759"; Path=/;
+      Cookie: [vmware_soap_session="57e9ef0e1210352a3cf607db32a20792334f5b81"; Path=/;
           HttpOnly; Secure;]
-      SOAPAction: ['"urn:vim25/6.0"']
+      SOAPAction: ['"urn:vim25/4.1"']
     method: POST
     uri: https://vcsa/sdk
   response:
@@ -221,19 +189,17 @@ interactions:
         \ VirtualCenter Server</licenseProductName><licenseProductVersion>6.0</licenseProductVersion></about><setting\
         \ type=\"OptionManager\">VpxSettings</setting><userDirectory type=\"UserDirectory\"\
         >UserDirectory</userDirectory><sessionManager type=\"SessionManager\">SessionManager</sessionManager><authorizationManager\
-        \ type=\"AuthorizationManager\">AuthorizationManager</authorizationManager><serviceManager\
-        \ type=\"ServiceManager\">ServiceMgr</serviceManager><perfManager type=\"\
-        PerformanceManager\">PerfMgr</perfManager><scheduledTaskManager type=\"ScheduledTaskManager\"\
-        >ScheduledTaskManager</scheduledTaskManager><alarmManager type=\"AlarmManager\"\
-        >AlarmManager</alarmManager><eventManager type=\"EventManager\">EventManager</eventManager><taskManager\
-        \ type=\"TaskManager\">TaskManager</taskManager><extensionManager type=\"\
-        ExtensionManager\">ExtensionManager</extensionManager><customizationSpecManager\
+        \ type=\"AuthorizationManager\">AuthorizationManager</authorizationManager><perfManager\
+        \ type=\"PerformanceManager\">PerfMgr</perfManager><scheduledTaskManager type=\"\
+        ScheduledTaskManager\">ScheduledTaskManager</scheduledTaskManager><alarmManager\
+        \ type=\"AlarmManager\">AlarmManager</alarmManager><eventManager type=\"EventManager\"\
+        >EventManager</eventManager><taskManager type=\"TaskManager\">TaskManager</taskManager><extensionManager\
+        \ type=\"ExtensionManager\">ExtensionManager</extensionManager><customizationSpecManager\
         \ type=\"CustomizationSpecManager\">CustomizationSpecManager</customizationSpecManager><customFieldsManager\
         \ type=\"CustomFieldsManager\">CustomFieldsManager</customFieldsManager><diagnosticManager\
         \ type=\"DiagnosticManager\">DiagMgr</diagnosticManager><licenseManager type=\"\
         LicenseManager\">LicenseManager</licenseManager><searchIndex type=\"SearchIndex\"\
-        >SearchIndex</searchIndex><fileManager type=\"FileManager\">FileManager</fileManager><datastoreNamespaceManager\
-        \ type=\"DatastoreNamespaceManager\">DatastoreNamespaceManager</datastoreNamespaceManager><virtualDiskManager\
+        >SearchIndex</searchIndex><fileManager type=\"FileManager\">FileManager</fileManager><virtualDiskManager\
         \ type=\"VirtualDiskManager\">virtualDiskManager</virtualDiskManager><snmpSystem\
         \ type=\"HostSnmpSystem\">SnmpSystem</snmpSystem><vmProvisioningChecker type=\"\
         VirtualMachineProvisioningChecker\">ProvChecker</vmProvisioningChecker><vmCompatibilityChecker\
@@ -245,18 +211,14 @@ interactions:
         >ClusterProfileManager</clusterProfileManager><complianceManager type=\"ProfileComplianceManager\"\
         >MoComplianceManager</complianceManager><localizationManager type=\"LocalizationManager\"\
         >LocalizationManager</localizationManager><storageResourceManager type=\"\
-        StorageResourceManager\">StorageResourceManager</storageResourceManager><guestOperationsManager\
-        \ type=\"GuestOperationsManager\">guestOperationsManager</guestOperationsManager><overheadMemoryManager\
-        \ type=\"OverheadMemoryManager\">OverheadMemoryManger</overheadMemoryManager><certificateManager\
-        \ type=\"CertificateManager\">certificateManager</certificateManager><ioFilterManager\
-        \ type=\"IoFilterManager\">IoFilterManager</ioFilterManager></val></propSet></objects></returnval></RetrievePropertiesExResponse>\n\
+        StorageResourceManager\">StorageResourceManager</storageResourceManager></val></propSet></objects></returnval></RetrievePropertiesExResponse>\n\
         </soapenv:Body>\n</soapenv:Envelope>"}
     headers:
       cache-control: [no-cache]
       connection: [Keep-Alive]
-      content-length: ['3993']
+      content-length: ['3460']
       content-type: [text/xml; charset=utf-8]
-      date: ['Mon, 12 Oct 2015 16:18:07 GMT']
+      date: ['Mon, 12 Oct 2015 16:20:20 GMT']
     status: {code: 200, message: OK}
 - request:
     body: '<?xml version="1.0" encoding="UTF-8"?>
@@ -272,9 +234,9 @@ interactions:
     headers:
       Accept-Encoding: ['gzip, deflate']
       Content-Type: [text/xml; charset=UTF-8]
-      Cookie: [vmware_soap_session="8fc51e13679819f71dd3e925154d49dcf91f9759"; Path=/;
+      Cookie: [vmware_soap_session="57e9ef0e1210352a3cf607db32a20792334f5b81"; Path=/;
           HttpOnly; Secure;]
-      SOAPAction: ['"urn:vim25/6.0"']
+      SOAPAction: ['"urn:vim25/4.1"']
     method: POST
     uri: https://vcsa/sdk
   response:
@@ -284,14 +246,13 @@ interactions:
         http://www.w3.org/2001/XMLSchema\"\n xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\
         >\n<soapenv:Body>\n<RetrievePropertiesExResponse xmlns=\"urn:vim25\"><returnval><objects><obj\
         \ type=\"SessionManager\">SessionManager</obj><propSet><name>currentSession</name><val\
-        \ xsi:type=\"UserSession\"><key>52ad453a-13a7-e8af-9186-a1b5c5ab85b7</key><userName>VSPHERE.LOCAL\\\
-        Administrator</userName><fullName>Administrator vsphere.local</fullName><loginTime>2015-10-12T16:18:07.543834Z</loginTime><lastActiveTime>2015-10-12T16:18:07.55457Z</lastActiveTime><locale>en</locale><messageLocale>en</messageLocale><extensionSession>false</extensionSession><ipAddress>10.20.125.215</ipAddress><userAgent></userAgent><callCount>1</callCount></val></propSet></objects></returnval></RetrievePropertiesExResponse>\n\
+        \ xsi:type=\"UserSession\"><key>52b5395a-85c2-9902-7835-13a9b77e1fec</key><userName>my_user</userName><fullName>my_user</fullName><loginTime>2015-10-12T16:20:20.388804Z</loginTime><lastActiveTime>2015-10-12T16:20:20.400795Z</lastActiveTime><locale>en</locale><messageLocale>en</messageLocale></val></propSet></objects></returnval></RetrievePropertiesExResponse>\n\
         </soapenv:Body>\n</soapenv:Envelope>"}
     headers:
       cache-control: [no-cache]
       connection: [Keep-Alive]
-      content-length: ['1004']
+      content-length: ['880']
       content-type: [text/xml; charset=utf-8]
-      date: ['Mon, 12 Oct 2015 16:18:07 GMT']
+      date: ['Mon, 12 Oct 2015 16:20:20 GMT']
     status: {code: 200, message: OK}
 version: 1

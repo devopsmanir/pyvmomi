@@ -1,8 +1,8 @@
-.. image:: https://travis-ci.org/vmware/pyvmomi.svg?branch=v5.5.0_2014.1
+.. image:: https://travis-ci.org/vmware/pyvmomi.svg?branch=v6.0.0.2016.4
     :target: https://travis-ci.org/vmware/pyvmomi
     :alt: Build Status
 
-.. image:: https://pypip.in/download/pyvmomi/badge.png
+.. image:: https://img.shields.io/pypi/dm/pyvmomi.svg
     :target: https://pypi.python.org/pypi/pyvmomi/
     :alt: Downloads
 
@@ -48,11 +48,14 @@ Documentation
 =============
 For general language neutral documentation of vSphere Management API see: 
 
-* `vSphere WS SDK API Docs <http://pubs.vmware.com/vsphere-55/topic/com.vmware.wssdk.apiref.doc/right-pane.html>`_
+* `vSphere WS SDK API Docs <http://pubs.vmware.com/vsphere-65/topic/com.vmware.wssdk.apiref.doc/right-pane.html>`_
 
 Python Support
 ==============
-* pyVmomi 5.5.0-2014.1 and later support Python 2.6, 2.7, 3.3 and 3.4
+* pyVmomi 6.5 supports 2.7, 3.3, 3.4 and 3.5
+* pyVmomi 6.0.0.2016.4 and later support 2.7, 3.3 and 3.4
+* pyVmomi 6.0.0 and later support 2.7, 3.3 and 3.4
+* pyVmomi 5.5.0-2014.1 and 5.5.0-2014.1.1 support Python 2.6, 2.7, 3.3 and 3.4
 * pyVmomi 5.5.0 and below support Python 2.6 and 2.7
 
 Compatibility Policy
@@ -62,14 +65,19 @@ backward compatibility with the previous _four_ releases of *vSphere* and it's
 own previous four releases. Compatibility with much older versions may continue 
 to work but will not be actively supported.
 
-For example, version v5.5.0-2014.1 is most compatible with vSphere 5.5, 5.1, 
-5.0, and 4.1 and was the first release in 2014. Initial releases compatible with
-a version of vSphere will bare a naked version number of v5.5.0 indicating that 
-version of pyVmomi was released simultaneously with the *GA* version of vSphere 
-with the same version number.
+For example, version v6.0.0 is most compatible with vSphere 6.0, 5.5, 5.1 and
+5.0. Initial releases compatible with a version of vSphere will bare a naked
+version number of v6.0.0 indicating that version of pyVmomi was released
+simultaneously with the *GA* version of vSphere with the same version number.
 
 Releases
 ========
+* `6.5 <https://github.com/vmware/pyvmomi/tree/v6.5.0>`_
+   release notes https://github.com/vmware/pyvmomi/releases/tag/v6.5.0
+* `6.0.0.2016.4 <https://github.com/vmware/pyvmomi/tree/v6.0.0.2016.4>`_
+   release notes https://github.com/vmware/pyvmomi/releases/tag/v6.0.0.2016.4
+* `6.0.0 <https://github.com/vmware/pyvmomi/tree/v6.0.0>`_
+   release notes https://github.com/vmware/pyvmomi/releases/tag/v6.0.0
 * `5.5.0-2014.1.1 <https://github.com/vmware/pyvmomi/tree/v5.5.0-2014.1.1>`_
    release notes https://github.com/vmware/pyvmomi/releases/tag/v5.5.0-2014.1.1 
 * `5.5.0-2014.1 <https://github.com/vmware/pyvmomi/tree/v5.5.0-2014.1>`_
@@ -80,7 +88,8 @@ Releases
 
 Related Projects
 ================
-* Feature Incubator: pyvmomi-tools https://github.com/vmware/pyvmomi-tools
+* VMware vSphere Automation SDK for Python: https://developercenter.vmware.com/web/sdk/65/vsphere-automation-python
 * Samples Project: https://github.com/vmware/pyvmomi-community-samples
+* Feature Incubator: pyvmomi-tools https://github.com/vmware/pyvmomi-tools
 
 Have fun!

@@ -15,7 +15,6 @@
 from __future__ import print_function
 
 import tests
-import vcr
 
 from pyVim import connect
 from pyVmomi import vim
@@ -23,7 +22,7 @@ from pyVmomi import vim
 
 class VirtualMachineTests(tests.VCRTestBase):
 
-    @vcr.use_cassette('vm_nic_data.yaml',
+    @tests.VCRTestBase.my_vcr.use_cassette('vm_nic_data.yaml',
                       cassette_library_dir=tests.fixtures_path,
                       record_mode='never')
     def test_vm_nic_data(self):
@@ -60,6 +59,7 @@ class VirtualMachineTests(tests.VCRTestBase):
         si = connect.SmartConnect(host='vcsa',
                                   user='my_user',
                                   pwd='my_password')
+
         content = si.RetrieveContent()
         virtual_machines = content.viewManager.CreateContainerView(
             content.rootFolder, [vim.VirtualMachine], True)

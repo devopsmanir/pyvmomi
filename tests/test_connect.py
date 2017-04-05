@@ -15,7 +15,6 @@
 
 import tests
 import unittest
-import vcr
 
 from pyVim import connect
 from pyVmomi import vim
@@ -23,7 +22,7 @@ from pyVmomi import vim
 
 class ConnectionTests(tests.VCRTestBase):
 
-    @vcr.use_cassette('basic_connection.yaml',
+    @tests.VCRTestBase.my_vcr.use_cassette('basic_connection.yaml',
                       cassette_library_dir=tests.fixtures_path,
                       record_mode='none')
     def test_basic_connection(self):
@@ -38,10 +37,26 @@ class ConnectionTests(tests.VCRTestBase):
         self.assertEqual(cookie, si._stub.cookie)
         # NOTE (hartsock): assertIsNotNone does not work in Python 2.6
         self.assertTrue(session_id is not None)
-        self.assertEqual('52773cd3-35c6-b40a-17f1-fe664a9f08f3', session_id)
-        self.assertTrue(session_id in cookie)
+        self.assertEqual('52b5395a-85c2-9902-7835-13a9b77e1fec', session_id)
 
-    @vcr.use_cassette('basic_connection_bad_password.yaml',
+    @tests.VCRTestBase.my_vcr.use_cassette('sspi_connection.yaml',
+                      cassette_library_dir=tests.fixtures_path,
+                      record_mode='none')
+    def test_sspi_connection(self):
+        # see: http://python3porting.com/noconv.html
+        si = connect.Connect(host='vcsa',
+                             mechanism='sspi',
+                             b64token='my_base64token')
+        cookie = si._stub.cookie
+        session_id = si.content.sessionManager.currentSession.key
+        # NOTE (hartsock): The cookie value should never change during
+        # a connected session. That should be verifiable in these tests.
+        self.assertEqual(cookie, si._stub.cookie)
+        # NOTE (hartsock): assertIsNotNone does not work in Python 2.6
+        self.assertTrue(session_id is not None)
+        self.assertEqual('52b5395a-85c2-9902-7835-13a9b77e1fec', session_id)
+
+    @tests.VCRTestBase.my_vcr.use_cassette('basic_connection_bad_password.yaml',
                       cassette_library_dir=tests.fixtures_path,
                       record_mode='none')
     def test_basic_connection_bad_password(self):
@@ -52,7 +67,7 @@ class ConnectionTests(tests.VCRTestBase):
 
         self.assertRaises(vim.fault.InvalidLogin, should_fail)
 
-    @vcr.use_cassette('smart_connection.yaml',
+    @tests.VCRTestBase.my_vcr.use_cassette('smart_connection.yaml',
                       cassette_library_dir=tests.fixtures_path,
                       record_mode='none')
     def test_smart_connection(self):
@@ -63,18 +78,18 @@ class ConnectionTests(tests.VCRTestBase):
         session_id = si.content.sessionManager.currentSession.key
         # NOTE (hartsock): assertIsNotNone does not work in Python 2.6
         self.assertTrue(session_id is not None)
-        self.assertEqual('52773cd3-35c6-b40a-17f1-fe664a9f08f3', session_id)
+        self.assertEqual('52ad453a-13a7-e8af-9186-a1b5c5ab85b7', session_id)
 
     def test_disconnect_on_no_connection(self):
         connect.Disconnect(None)
 
-    @vcr.use_cassette('ssl_tunnel.yaml',
+    @tests.VCRTestBase.my_vcr.use_cassette('ssl_tunnel.yaml',
                       cassette_library_dir=tests.fixtures_path,
                       record_mode='none')
     def test_ssl_tunnel(self):
         connect.SoapStubAdapter('sdkTunnel', 8089, httpProxyHost='vcsa').GetConnection()
 
-    @vcr.use_cassette('ssl_tunnel_http_failure.yaml',
+    @tests.VCRTestBase.my_vcr.use_cassette('ssl_tunnel_http_failure.yaml',
                       cassette_library_dir=tests.fixtures_path,
                       record_mode='none')
     def test_ssl_tunnel_http_failure(self):

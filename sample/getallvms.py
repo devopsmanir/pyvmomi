@@ -20,18 +20,13 @@ Python program for listing the vms on an ESX / vCenter host
 
 from __future__ import print_function
 
-import pyVmomi
-
-from pyVmomi import vim
-from pyVmomi import vmodl
-
 from pyVim.connect import SmartConnect, Disconnect
-from pyVmomi import vmodl
+from pyVmomi import vim
 
 import argparse
 import atexit
 import getpass
-
+import ssl
 
 def GetArgs():
    """
@@ -54,7 +49,7 @@ def GetArgs():
 def PrintVmInfo(vm, depth=1):
    """
    Print information for a particular virtual machine or recurse into a folder
-    with depth protection
+   or vApp with depth protection
    """
    maxdepth = 10
 
@@ -66,6 +61,14 @@ def PrintVmInfo(vm, depth=1):
       vmList = vm.childEntity
       for c in vmList:
          PrintVmInfo(c, depth+1)
+      return
+
+   # if this is a vApp, it likely contains child VMs
+   # (vApps can nest vApps, but it is hardly a common usecase, so ignore that)
+   if isinstance(vm, vim.VirtualApp):
+      vmList = vm.vm
+      for c in vmList:
+         PrintVmInfo(c, depth + 1)
       return
 
    summary = vm.summary
@@ -96,10 +99,14 @@ def main():
       password = getpass.getpass(prompt='Enter password for host %s and '
                                         'user %s: ' % (args.host,args.user))
 
+   context = None
+   if hasattr(ssl, '_create_unverified_context'):
+      context = ssl._create_unverified_context()
    si = SmartConnect(host=args.host,
                      user=args.user,
                      pwd=password,
-                     port=int(args.port))
+                     port=int(args.port),
+                     sslContext=context)
    if not si:
        print("Could not connect to the specified host using specified "
              "username and password")

@@ -28,6 +28,7 @@ import argparse
 import atexit
 import getpass
 import sys
+import ssl
 
 def GetArgs():
    """
@@ -112,21 +113,21 @@ def main():
          print("No virtual machine specified for poweron")
          sys.exit()
 
-      si = None
-      try:
-         si = SmartConnect(host=args.host,
-                           user=args.user,
-                           pwd=password,
-                           port=int(args.port))
-      except IOError:
-         pass
+      context = None
+      if hasattr(ssl, '_create_unverified_context'):
+         context = ssl._create_unverified_context()
+      si = SmartConnect(host=args.host,
+                        user=args.user,
+                        pwd=password,
+                        port=int(args.port),
+                        sslContext=context)
       if not si:
          print("Cannot connect to specified host using specified username and password")
          sys.exit()
 
       atexit.register(Disconnect, si)
 
-      # Retreive the list of Virtual Machines from the invetory objects
+      # Retreive the list of Virtual Machines from the inventory objects
       # under the rootFolder
       content = si.content
       objView = content.viewManager.CreateContainerView(content.rootFolder,

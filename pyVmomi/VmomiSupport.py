@@ -1,5 +1,5 @@
 # VMware vSphere Python SDK
-# Copyright (c) 2008-2015 VMware, Inc. All Rights Reserved.
+# Copyright (c) 2008-2016 VMware, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,17 +21,15 @@ from six import iteritems
 from six import iterkeys
 from six import itervalues
 from six import text_type
+from six import string_types
+from six import binary_type
 from six import PY3
 from datetime import datetime
 from pyVmomi import Iso8601
 import base64
 import threading
-
 if PY3:
-    # python3 removed long, it's the same as int
-    long = int
-    # python3 removed basestring, use str instead.
-    basestring = str
+   from functools import cmp_to_key
 
 NoneType = type(None)
 try:
@@ -48,7 +46,8 @@ except:
 
 (F_LINK,
  F_LINKABLE,
- F_OPTIONAL) = [ 1<<x for x in range(3) ]
+ F_OPTIONAL,
+ F_SECRET) = [ 1<<x for x in range(4) ]
 
 BASE_VERSION = 'vmodl.version.version0'
 VERSION1     = 'vmodl.version.version1'
@@ -78,6 +77,9 @@ _wsdlDefMap = {}
 # Map that stores the nested classes for a given class
 # if a.b.c and a.b.d are the nested classes of a.b, then _dependencyMap[a.b] = {c,d}
 _dependencyMap = {}
+
+# Map top level names to xml namespaces
+_urnMap = {"vim": XMLNS_VMODL_BASE, "sms": "urn:sms", "pbm": "urn:pbm"}
 
 ## Update the dependency map
 #  Note: Must be holding the _lazyLock
@@ -191,7 +193,7 @@ class LazyObject(Object):
 
 class Link(text_type):
    def __new__(cls, obj):
-      if isinstance(obj, basestring):
+      if isinstance(obj, string_types):
          return text_type.__new__(cls, obj)
       elif isinstance(obj, DataObject):
          if obj.key:
@@ -251,9 +253,9 @@ class LazyModule(object):
          else:
             if _CheckForDependency(self.name, attr):
                typeObj = LazyModule(name)
-            elif self.name == "vim":
+            elif self.name in _urnMap:
                try:
-                  typeObj = GetWsdlType(XMLNS_VMODL_BASE, attr)
+                  typeObj = GetWsdlType(_urnMap[self.name], attr)
                except:
                   raise AttributeError(attr)
             else:
@@ -305,6 +307,8 @@ def FormatObject(val, info=Object(name="", type=object, flags=0), indent=0):
          result = "(%s) []" % itemType.__name__
    elif isinstance(val, type):
       result = val.__name__
+   elif isinstance(val, UncallableManagedMethod):
+      result = val.name
    elif isinstance(val, ManagedMethod):
       result = '%s.%s' % (val.info.type.__name__, val.info.name)
    elif isinstance(val, bool):
@@ -313,6 +317,13 @@ def FormatObject(val, info=Object(name="", type=object, flags=0), indent=0):
       result = Iso8601.ISO8601Format(val)
    elif isinstance(val, binary):
       result = base64.b64encode(val)
+      if PY3:
+         # In python3 the bytes result after the base64 encoding has a
+         # leading 'b' which causes error when we use it to construct the
+         # soap message. Workaround the issue by converting the result to
+         # string. Since the result of base64 encoding contains only subset
+         # of ASCII chars, converting to string will not change the value.
+         result = str(result, 'utf-8')
    else:
       result = repr(val)
    return start + result
@@ -371,7 +382,7 @@ class ManagedObject(object):
                raise TypeError("%s() got multiple values for keyword argument '%s'" %
                               (Capitalize(info.name),  k))
             args[idx] = v
-      map(CheckField, info.params, args)
+      list(map(CheckField, info.params, args))
       return self._stub.InvokeMethod(self, info, args)
    _InvokeMethod = staticmethod(_InvokeMethod)
 
@@ -419,7 +430,7 @@ class ManagedObject(object):
       result = []
       while cls != ManagedObject:
          # Iterate through methods, add info for method not found in derived class
-         result = [info for info in cls._methodInfo.values()
+         result = [info for info in list(cls._methodInfo.values())
                    if meth.setdefault(info.name, cls) == cls] + result
          cls = cls.__bases__[0]
       return result
@@ -464,6 +475,9 @@ class ManagedObject(object):
                 self.__class__ == other.__class__ and \
                 self._serverGuid == other._serverGuid
 
+   def __ne__(self, other):
+      return not(self == other)
+
    def __hash__(self):
       return str(self).__hash__()
 
@@ -500,7 +514,7 @@ class DataObject(Base):
             SetAttr(self, info.name, info.type(0))
          else:
             SetAttr(self, info.name, None)
-      for (k, v) in kwargs.items():
+      for (k, v) in list(kwargs.items()):
          setattr(self, k, v)
 
    ## Get a list of all properties of this type and base types
@@ -575,6 +589,15 @@ class ManagedMethod(Curry):
    def __init__(self, info):
       Curry.__init__(self, ManagedObject._InvokeMethod, info)
       self.info = info
+
+# Method used to represent any unknown wsdl method returned by server response.
+# Server may return unknown method name due to server defects or newer version.
+class UncallableManagedMethod(ManagedMethod):
+   def __init__(self, name):
+      self.name = name
+
+   def __call__(self, *args, **kwargs):
+      raise Exception("Managed method {} is not available".format(self.name))
 
 ## Create the vmodl.MethodFault type
 #
@@ -939,7 +962,7 @@ def CheckField(info, val):
         or issubclass(info.type, long) and (issubclass(valType, int) or \
                                             issubclass(valType, long)) \
         or issubclass(info.type, float) and issubclass(valType, float) \
-        or issubclass(info.type, basestring) and issubclass(valType, basestring):
+        or issubclass(info.type, string_types) and issubclass(valType, string_types):
          return
       elif issubclass(info.type, Link):
          # Allow object of expected type to be assigned to link
@@ -956,9 +979,9 @@ def FinalizeType(type):
       for info in type._propList:
          info.type = GetVmodlType(info.type)
    elif issubclass(type, ManagedObject):
-      for info in type._propInfo.values():
+      for info in list(type._propInfo.values()):
          info.type = GetVmodlType(info.type)
-      for info in type._methodInfo.values():
+      for info in list(type._methodInfo.values()):
          info.result = GetVmodlType(info.result)
          info.methodResult = GetVmodlType(info.methodResult)
          info.type = GetVmodlType(info.type)
@@ -1026,9 +1049,15 @@ class UnknownWsdlTypeError(KeyError):
 # @return type if found in any one of the name spaces else throws KeyError
 def GuessWsdlType(name):
    with _lazyLock:
-      # Because the types are lazily loaded, if some name is present
-      # in multiple namespaces, we will load the first type that we
-      # encounter and return it.
+      # Some types may exist in multiple namespaces, and returning
+      # the wrong one will cause a deserialization error.
+      # Since in python3 the order of entries in set is not deterministic,
+      # we will try to get the type from vim25 namespace first.
+      try:
+         return GetWsdlType(XMLNS_VMODL_BASE, name)
+      except KeyError:
+         pass
+
       for ns in _wsdlTypeMapNSs:
          try:
             return GetWsdlType(ns, name)
@@ -1133,22 +1162,21 @@ def GetServiceVersions(namespace):
    by compatibility (i.e. any version in the list that is compatible with some version
    v in the list will preceed v)
    """
-   versions = dict((v, True) for (v, n) in iteritems(serviceNsMap) if n == namespace)
-   mappings = {}
-   for v in iterkeys(versions):
-      mappings[v] = set(parent for parent in iterkeys(parentMap[v])
-                        if parent != v and parent in versions.keys())
-   res = []
-   while True:
-      el = [ k for (k, v) in iteritems(mappings) if len(v) == 0 ]
-      if len(el) == 0:
-         return res
-      el.sort()
-      for k in el:
-         res.insert(0, k)
-         del mappings[k]
-         for values in itervalues(mappings):
-            values.discard(k)
+   def compare(a, b):
+      if a == b:
+         return 0
+      if b in parentMap[a]:
+         return -1
+      if a in parentMap[b]:
+         return 1
+      return (a > b) - (a < b)
+
+   if PY3:
+      return sorted([v for (v, n) in iteritems(serviceNsMap) if n == namespace],
+                    key=cmp_to_key(compare))
+   else:
+      return sorted([v for (v, n) in iteritems(serviceNsMap) if n == namespace],
+                    compare)
 
 
 ## Set a WSDL method with wsdl namespace and wsdl name
@@ -1220,6 +1248,15 @@ def GetWsdlMethod(ns, wsdlName):
 # KeyError
 def GuessWsdlMethod(name):
    with _lazyLock:
+      # Some methods may exist in multiple namespaces, and returning
+      # the wrong one will cause a deserialization error.
+      # Since in python3 the order of entries in set is not deterministic,
+      # we will try to get the method from vim25 namespace first.
+      try:
+         return GetWsdlMethod(XMLNS_VMODL_BASE, name)
+      except KeyError:
+         pass
+
       for ns in _wsdlMethodNSs:
          try:
             return GetWsdlMethod(ns, name)
@@ -1240,12 +1277,42 @@ def GetCompatibleType(type, version):
 def InverseMap(map):
    return dict([ (v, k) for (k, v) in iteritems(map) ])
 
+## Support for build-time versions
+class _BuildVersions:
+   def __init__(self):
+      self._verMap = {}
+      self._nsMap = {}
+
+   def Add(self, version):
+      assert '.version.' in version, 'Invalid version %s' % version
+
+      vmodlNs = version.split(".version.", 1)[0].split(".")
+      for idx in [1, len(vmodlNs)]:
+         subVmodlNs = ".".join(vmodlNs[:idx])
+         if not (subVmodlNs in self._verMap):
+            self._verMap[subVmodlNs] = version
+         if not (subVmodlNs in self._nsMap):
+            self._nsMap[subVmodlNs] = GetVersionNamespace(version)
+
+   def Get(self, vmodlNs):
+      return self._verMap[vmodlNs]
+
+   def GetNamespace(self, vmodlNs):
+      return self._nsMap[vmodlNs]
+
 types = Object()
 nsMap = {}
 versionIdMap = {}
 versionMap = {}
 serviceNsMap = { BASE_VERSION : XMLNS_VMODL_BASE.split(":")[-1] }
 parentMap = {}
+
+newestVersions = _BuildVersions()
+currentVersions = _BuildVersions()
+stableVersions = _BuildVersions()
+matureVersions = _BuildVersions()
+publicVersions = _BuildVersions()
+oldestVersions = _BuildVersions()
 
 from pyVmomi.Version import AddVersion, IsChildVersion
 
@@ -1255,8 +1322,10 @@ if not isinstance(bool, type): # bool not a type in python <= 2.2
 byte  = type("byte", (int,), {})
 short  = type("short", (int,), {})
 double = type("double", (float,), {})
+if PY3:
+   long = type("long", (int,), {})
 URI = type("URI", (str,), {})
-binary = type("binary", (str,), {})
+binary = type("binary", (binary_type,), {})
 PropertyPath = type("PropertyPath", (text_type,), {})
 
 # _wsdlTypeMapNSs store namespaces added to _wsdlTypeMap in _SetWsdlType
@@ -1283,7 +1352,7 @@ _wsdlTypeMap = {
 }
 _wsdlNameMap = InverseMap(_wsdlTypeMap)
 
-for ((ns, name), typ) in iteritems(dict(_wsdlTypeMap)):
+for ((ns, name), typ) in list(_wsdlTypeMap.items()):
    if typ is not NoneType:
       setattr(types, typ.__name__, typ)
       _wsdlTypeMapNSs.add(ns)
@@ -1487,7 +1556,7 @@ class StringDict(dict):
 
    def __setitem__(self, key, val):
       """x.__setitem__(i, y) <==> x[i]=y, where y must be a string"""
-      if not isinstance(val, basestring):
+      if not isinstance(val, string_types):
          raise TypeError("key %s has non-string value %s of %s" %
                                                          (key, val, type(val)))
       return dict.__setitem__(self, key, val)
@@ -1602,7 +1671,7 @@ class LinkResolver:
    def _AddLinkable(self, obj):
       key = getattr(obj, "key")
       if key and key != '':
-         if self.linkables.has_key(key):
+         if key in self.linkables:
             #duplicate key present
             raise AttributeError(key)
          else:

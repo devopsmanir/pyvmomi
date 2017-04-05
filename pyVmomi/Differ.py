@@ -1,5 +1,5 @@
 # VMware vSphere Python SDK
-# Copyright (c) 2008-2015 VMware, Inc. All Rights Reserved.
+# Copyright (c) 2008-2016 VMware, Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
 # limitations under the License.
 
 ## Diff any two objects
-from six import text_type
-from six import u
+import six
+from six.moves import zip
 
 from pyVmomi import VmomiSupport, types
-import itertools
 import logging
 from VmomiSupport import GetWsdlName, Type
 
@@ -32,10 +31,9 @@ def LogIf(condition, message):
 def IsPrimitiveType(obj):
    """See if the passed in type is a Primitive Type"""
    return (isinstance(obj, types.bool) or isinstance(obj, types.byte) or
-      isinstance(obj, types.short) or isinstance(obj, types.int) or
+      isinstance(obj, types.short) or isinstance(obj, six.integer_types) or
       isinstance(obj, types.double) or isinstance(obj, types.float) or
-      isinstance(obj, types.long) or isinstance(obj, types.str) or
-      isinstance(obj, text_type) or
+      isinstance(obj, six.string_types) or
       isinstance(obj, types.PropertyPath) or
       isinstance(obj, types.ManagedMethod) or
       isinstance(obj, types.datetime) or
@@ -99,7 +97,7 @@ class Differ:
          __Log__.debug('DiffDoArrays: Array lengths do not match %d != %d'
             % (len(oldObj), len(newObj)))
          return False
-      for i, j in itertools.izip(oldObj, newObj):
+      for i, j in zip(oldObj, newObj):
          if isElementLinks:
             if i.GetKey() != j.GetKey():
                __Log__.debug('DiffDoArrays: Keys do not match %s != %s'
@@ -118,7 +116,7 @@ class Differ:
          __Log__.debug('DiffAnyArrays: Array lengths do not match. %d != %d'
             % (len(oldObj), len(newObj)))
          return False
-      for i, j in itertools.izip(oldObj, newObj):
+      for i, j in zip(oldObj, newObj):
          if not self.DiffAnyObjects(i, j, isElementLinks):
             __Log__.debug('DiffAnyArrays: One of the elements do not match.')
             return False
@@ -136,7 +134,7 @@ class Differ:
          newSet = newObj and frozenset(newObj) or frozenset()
          match = (oldSet == newSet)
       else:
-         for i, j in itertools.izip(oldObj, newObj):
+         for i, j in zip(oldObj, newObj):
             if i != j:
                match = False
                break

@@ -7,3 +7,4 @@ dist
 *.patch
 *.diff
 *.egg*
+logging/
